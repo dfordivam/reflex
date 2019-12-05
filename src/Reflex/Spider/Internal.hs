@@ -63,6 +63,7 @@ import Data.Monoid ((<>))
 import Data.Proxy
 import Data.These
 import Data.Traversable
+import Data.Type.Equality ((:~:) ( Refl ))
 import Data.Witherable (Filterable, mapMaybe)
 import GHC.Exts
 import GHC.IORef (IORef (..))
@@ -971,8 +972,6 @@ instance Monad (BehaviorM x) where
   BehaviorM x >> BehaviorM y = BehaviorM $ x >> y
   {-# INLINE return #-}
   return x = BehaviorM $ return x
-  {-# INLINE fail #-}
-  fail s = BehaviorM $ fail s
 
 data BehaviorSubscribed x a
    = forall p. BehaviorSubscribedHold (Hold x p)
@@ -2356,8 +2355,6 @@ instance HasSpiderTimeline x => Monad (Reflex.Class.Dynamic (SpiderTimeline x)) 
   x >>= f = SpiderDynamic $ dynamicDynIdentity $ newJoinDyn $ newMapDyn (unSpiderDynamic . f) $ unSpiderDynamic x
   {-# INLINE (>>) #-}
   (>>) = (*>)
-  {-# INLINE fail #-}
-  fail _ = error "Dynamic does not support 'fail'"
 
 {-# INLINABLE newJoinDyn #-}
 newJoinDyn :: HasSpiderTimeline x => DynamicS x (Identity (DynamicS x (Identity a))) -> Reflex.Spider.Internal.Dyn x (Identity a)
@@ -2636,8 +2633,6 @@ instance Monad (SpiderHost x) where
   SpiderHost x >> SpiderHost y = SpiderHost $ x >> y
   {-# INLINABLE return #-}
   return x = SpiderHost $ return x
-  {-# INLINABLE fail #-}
-  fail s = SpiderHost $ fail s
 
 -- | Run an action affecting the global Spider timeline; this will be guarded by
 -- a mutex for that timeline
@@ -2659,8 +2654,6 @@ instance Monad (SpiderHostFrame x) where
   SpiderHostFrame x >> SpiderHostFrame y = SpiderHostFrame $ x >> y
   {-# INLINABLE return #-}
   return x = SpiderHostFrame $ return x
-  {-# INLINABLE fail #-}
-  fail s = SpiderHostFrame $ fail s
 
 instance NotReady (SpiderTimeline x) (SpiderHostFrame x) where
   notReadyUntil _ = pure ()

@@ -53,7 +53,7 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Some (Some(Some))
 import Data.These
-import Data.Typeable hiding (Refl)
+import Data.Typeable
 
 --------------------------------------------------------------------------------
 -- Const2
